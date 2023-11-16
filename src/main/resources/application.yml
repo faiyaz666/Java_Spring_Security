@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:test
+    username: root
+    password: root
+    driver-class-name: org.h2.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
