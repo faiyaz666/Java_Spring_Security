@@ -25,7 +25,7 @@ public class WebSecurity {
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        return httpSecurity
+        httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headersConfigurer -> headersConfigurer
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
@@ -33,12 +33,26 @@ public class WebSecurity {
                 .authorizeHttpRequests(authConfig -> authConfig
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(antMatcher("/login/**")).permitAll()
+                        .requestMatchers(antMatcher("/css/**")).permitAll()
                         .requestMatchers(antMatcher("/register/**")).permitAll()
                         .requestMatchers(antMatcher("/user/register/**")).permitAll()
                         .requestMatchers(antMatcher("/user/**")).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                         .requestMatchers(antMatcher("/admin/**")).hasAuthority("ROLE_ADMIN")
                         .anyRequest().fullyAuthenticated())
-                .userDetailsService(customUserDetailsService)
-                .build();
+                .formLogin(loginConfigurer -> loginConfigurer
+                        .loginPage("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .failureUrl("/login?error=true")
+                )
+                .logout(logoutConfigurer -> logoutConfigurer
+                        .logoutUrl("/logout")
+                )
+                .userDetailsService(customUserDetailsService);
+
+        return httpSecurity.build();
+
     }
 }
